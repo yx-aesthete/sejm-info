@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  web:
+    image: {{ docker_registry }}/{{ docker_user }}/sejm-web:latest
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL={{ supabase_url }}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY={{ supabase_anon_key }}
+    networks:
+      - app_network
+
+  sync-service:
+    image: {{ docker_registry }}/{{ docker_user }}/sejm-sync-service:latest
+    restart: always
+    environment:
+      - SUPABASE_URL={{ supabase_url }}
+      - SUPABASE_SERVICE_ROLE_KEY={{ supabase_service_role_key }}
+      - OPENAI_API_KEY={{ openai_api_key }}
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
