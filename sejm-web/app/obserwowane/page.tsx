@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Header } from "@/components/portal/header"
 import { Card, CardContent } from "@/components/ui/card"
@@ -8,7 +8,7 @@ import { Bookmark, ArrowRight, Bell, BellOff } from "lucide-react"
 import Link from "next/link"
 
 export default async function ObserwowanePage() {
-  const supabase = await createClient()
+  const supabase = await createServerSupabaseClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()

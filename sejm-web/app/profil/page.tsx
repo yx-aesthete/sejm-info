@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Header } from "@/components/portal/header"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { CATEGORY_CONFIG, type LegislativeCategory } from "@/lib/legislative-extended-schema"
 
 export default async function ProfilPage() {
-  const supabase = await createClient()
+  const supabase = await createServerSupabaseClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
