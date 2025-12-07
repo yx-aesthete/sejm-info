@@ -23,6 +23,19 @@ services:
     networks:
       - app_network
 
+  ml-service:
+    image: {{ docker_registry }}/{{ docker_user }}/sejm-ml-service:latest
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - SUPABASE_URL={{ supabase_url }}
+      - SUPABASE_KEY={{ supabase_service_role_key }}
+      - OPENAI_API_KEY={{ openai_api_key }}
+      - ML_SERVICE_PORT=8000
+    networks:
+      - app_network
+
 networks:
   app_network:
     driver: bridge

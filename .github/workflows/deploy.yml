@@ -18,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [sejm-web, sejm-sync-service]
+        service: [sejm-web, sejm-sync-service, sejm-ml-service]
 
     steps:
       - name: Checkout repository

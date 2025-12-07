@@ -1,0 +1,23 @@
+# Core dependencies
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+python-dotenv==1.0.0
+
+# Database
+supabase==2.3.0
+psycopg2-binary==2.9.9
+
+# Data science & ML
+pandas==2.1.4
+numpy==1.26.3
+scikit-learn==1.4.0
+scipy==1.11.4
+
+# NLP & Text Analysis
+openai==1.10.0
+regex==2023.12.25
+
+# Visualization (for reports)
+matplotlib==3.8.2
+seaborn==0.13.1

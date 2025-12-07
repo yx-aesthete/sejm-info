@@ -1,0 +1,8 @@
+docker_registry: ghcr.io
+docker_user: your-github-username
+docker_password: your-github-token
+
+supabase_url: your-supabase-url
+supabase_anon_key: your-supabase-anon-key
+supabase_service_role_key: your-supabase-service-role-key
+openai_api_key: your-openai-api-key

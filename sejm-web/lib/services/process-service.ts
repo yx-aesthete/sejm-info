@@ -253,12 +253,38 @@ export async function getProcessStats(filters: ProcessFilters = {}) {
       }
     }
 
+    // Count processes by current stage (from timeline)
+    const { data: processesWithTimeline } = await buildQuery(
+      supabase
+        .from("legislative_processes")
+        .select("timeline, is_finished, is_rejected")
+        .eq("is_finished", false)
+        .eq("is_rejected", false)
+    )
+
+    const stageBreakdown: Record<string, number> = {}
+
+    if (processesWithTimeline && processesWithTimeline.length > 0) {
+      for (const proc of processesWithTimeline) {
+        const timeline = proc.timeline as TimelineNode[] | undefined
+        if (timeline && timeline.length > 0) {
+          // Find current stage (status: "current")
+          const currentNode = timeline.find(node => node.status === "current")
+          if (currentNode) {
+            const stageName = currentNode.name
+            stageBreakdown[stageName] = (stageBreakdown[stageName] || 0) + 1
+          }
+        }
+      }
+    }
+
     return {
       totalProcesses: totalRes.count || 0,
       activeProcesses: activeRes.count || 0,
       finishedProcesses: finishedRes.count || 0,
       rejectedProcesses: rejectedRes.count || 0,
       avgDuration,
+      stageBreakdown,
     }
   } catch (error) {
     console.error("[ProcessService] getProcessStats error:", error)
@@ -268,6 +294,7 @@ export async function getProcessStats(filters: ProcessFilters = {}) {
       finishedProcesses: 0,
       rejectedProcesses: 0,
       avgDuration: 0,
+      stageBreakdown: {},
     }
   }
 }
