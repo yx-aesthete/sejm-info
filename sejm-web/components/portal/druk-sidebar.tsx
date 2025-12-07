@@ -401,7 +401,11 @@ export function DrukSidebar({ isOpen, onClose, currentDrukNr }: DrukSidebarProps
                                     color: CATEGORY_CONFIG[cat]?.color,
                                   }}
                                 >
-                                  {CATEGORY_CONFIG[cat]?.icon} {CATEGORY_CONFIG[cat]?.label}
+                                  {CATEGORY_CONFIG[cat]?.icon && (() => {
+                                    const Icon = CATEGORY_CONFIG[cat].icon;
+                                    return <Icon className="mr-1 h-3 w-3 inline-block" />
+                                  })()}
+                                  {CATEGORY_CONFIG[cat]?.label}
                                 </span>
                               ))}
                             </div>
