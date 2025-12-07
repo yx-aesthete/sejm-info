@@ -62,12 +62,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create Ansible Inventory
-        env:
-          SSH_IP: ${{ secrets.SSH_IP }}
-        run: |
-          echo "[sejm]" > ansible/inventory.ini
-          echo "${SSH_IP} ansible_user=root ansible_python_interpreter=/usr/bin/python3" >> ansible/inventory.ini
+      # Inventory generation removed - using static inventory.ini with hardcoded IP
+      # Secrets are passed via environment variables to the playbook command
 
       - name: Run Ansible Playbook
         env:
