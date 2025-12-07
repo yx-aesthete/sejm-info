@@ -122,9 +122,9 @@ export function LegislativeDashboard() {
   const showSenatEstimation = nextVoting?.institution === "senat"
 
   const initiatorColor = selectedProcess ? INITIATOR_COLORS[selectedProcess.initiator] || "#6b7280" : "#6b7280"
-  // Fixed typing issue with INITIATOR_LABELS
+  
   const initiatorLabel = selectedProcess
-    ? (INITIATOR_LABELS as any)[selectedProcess.initiator] || "Projekt ustawodawczy"
+    ? INITIATOR_LABELS[selectedProcess.initiator as keyof typeof INITIATOR_LABELS] || "Projekt ustawodawczy"
     : "Projekt"
 
   const handleMouseMoveH = useCallback(

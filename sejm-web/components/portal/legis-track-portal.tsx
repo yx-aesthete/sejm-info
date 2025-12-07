@@ -97,9 +97,10 @@ export function LegisTrackPortal() {
     return params.toString()
   }, [searchQuery, filters])
 
-  // Fetch initial processes
-  const fetchProcesses = useCallback(async (reset = true) => {
-    const newOffset = reset ? 0 : offset
+  // Fetch processes
+  // We remove 'offset' from dependencies to prevent loop
+  const fetchProcesses = useCallback(async (reset: boolean, currentOffset: number) => {
+    const offsetToUse = reset ? 0 : currentOffset
     
     if (reset) {
       setIsLoading(true)
@@ -110,7 +111,7 @@ export function LegisTrackPortal() {
     }
 
     try {
-      const queryString = buildQueryParams(newOffset)
+      const queryString = buildQueryParams(offsetToUse)
       const res = await fetch(`/api/processes?${queryString}`)
       const json = await res.json()
       
@@ -124,27 +125,27 @@ export function LegisTrackPortal() {
       }
       
       setTotalCount(count)
-      setHasMore(newOffset + newData.length < count)
-      setOffset(newOffset + newData.length)
+      setHasMore(offsetToUse + newData.length < count)
+      setOffset(offsetToUse + newData.length)
     } catch (error) {
       console.error("Failed to fetch processes:", error)
     } finally {
       setIsLoading(false)
       setIsLoadingMore(false)
     }
-  }, [buildQueryParams, offset])
+  }, [buildQueryParams]) // No offset dependency
 
   // Initial load and filter changes
   useEffect(() => {
-    fetchProcesses(true)
-  }, [searchQuery, filters])
+    fetchProcesses(true, 0)
+  }, [fetchProcesses])
 
   // Load more function
   const loadMore = useCallback(() => {
     if (!isLoadingMore && hasMore) {
-      fetchProcesses(false)
+      fetchProcesses(false, offset)
     }
-  }, [fetchProcesses, isLoadingMore, hasMore])
+  }, [fetchProcesses, isLoadingMore, hasMore, offset])
 
   // Infinite scroll observer
   useEffect(() => {

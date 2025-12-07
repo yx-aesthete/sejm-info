@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     
     const { data, count } = await getProcesses({
       search: searchParams.get("search") || undefined,
-      status: searchParams.get("status") as any,
+      status: searchParams.get("status") as "all" | "active" | "finished" | "rejected" | undefined,
       projectType: searchParams.get("projectType") || undefined,
       limit: Number.parseInt(searchParams.get("limit") || "50"),
       offset: Number.parseInt(searchParams.get("offset") || "0"),

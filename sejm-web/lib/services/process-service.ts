@@ -21,7 +21,7 @@ export interface DbProcess {
   timeline?: TimelineNode[]
   categories?: string[]
   urgency?: string
-  extended_data?: any
+  extended_data?: Record<string, unknown>
 }
 
 // Mapper from DB to Extended Process
@@ -46,22 +46,22 @@ export function mapDbToExtended(process: DbProcess): ExtendedLegislativeProcess 
     shortTitle: process.title.length > 80 ? process.title.substring(0, 80) + "..." : process.title,
     documentNumber: `Druk nr ${process.number}`,
     initiator,
-    initiatorName: extended.initiatorName || "Inicjator",
+    initiatorName: (extended.initiatorName as string) || "Inicjator",
     processStatus: process.is_rejected ? "rejected" : process.is_finished ? "completed" : "in-progress",
     timeline,
     lastUpdated: process.change_date || process.updated_at,
     sourceUrl: `https://www.sejm.gov.pl/sejm10.nsf/PrzebiegProc.xsp?id=${process.number}`,
     categories,
     urgency,
-    simpleSummary: extended.simpleSummary || process.description || process.title,
-    simpleExplanation: extended.simpleExplanation || null,
-    keyChanges: extended.keyChanges || [],
-    relatedLaws: extended.relatedLaws || [],
+    simpleSummary: (extended.simpleSummary as string) || process.description || process.title,
+    simpleExplanation: (extended.simpleExplanation as string) || null,
+    keyChanges: (extended.keyChanges as string[]) || [],
+    relatedLaws: (extended.relatedLaws as any[]) || [],
     viewCount: 0,
     watchCount: 0,
     commentCount: 0,
-    tags: extended.tags || [],
-    impact: extended.impact,
+    tags: (extended.tags as string[]) || [],
+    impact: extended.impact as any,
   }
 }
 
@@ -394,4 +394,3 @@ export async function getClubs() {
     return []
   }
 }
-

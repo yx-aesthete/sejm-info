@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ParliamentHemicycle } from "@/components/parliament-hemicycle"
-import { SEJM_PARTIES } from "@/lib/parliament-data"
+import { SEJM_PARTIES, SEJM_COMPOSITION } from "@/lib/parliament-data"
 
 export async function generateMetadata({
   params,
@@ -164,7 +164,7 @@ export default async function GlosowaniePage({
               <CardTitle>Rozkład głosów w Sejmie</CardTitle>
             </CardHeader>
             <CardContent>
-              <ParliamentHemicycle parties={SEJM_PARTIES} votingResult={voting.votes} chamber="Sejm" />
+              <ParliamentHemicycle composition={SEJM_COMPOSITION} votingResult={voting.votes} />
             </CardContent>
           </Card>
         </div>
