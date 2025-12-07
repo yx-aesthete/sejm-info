@@ -29,7 +29,7 @@ export async function enrichProcesses(supabase: SupabaseClient, term: number) {
     // Fetch all prints once (for mapping)
     const { data: prints } = await supabase
       .from("prints")
-      .select("number, title, process_print")
+      .select("number, title, process_print, attachments")
       .eq("term_number", term)
 
     // Process in chunks

@@ -67,7 +67,7 @@ export async function getProcessPrintContent(
   }
 
   // Pobierz pierwszy PDF (zazwyczaj główny dokument)
-  const mainAttachment = print.attachments.find(a => a.name.toLowerCase().includes(".pdf"))
+  const mainAttachment = print.attachments.find(a => a?.name?.toLowerCase().includes(".pdf"))
 
   if (!mainAttachment) {
     console.log(`[PDF] No PDF attachment for print ${processNumber}`)
