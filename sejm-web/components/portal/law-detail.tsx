@@ -407,18 +407,25 @@ export function LawDetail({ process, isWatched = false, onWatch, onClose }: LawD
           <Card>
             <CardContent className="py-4">
               <div className="flex flex-wrap gap-2">
-                {process.categories.map((cat) => (
-                  <Badge
-                    key={cat}
-                    variant="secondary"
-                    style={{
-                      backgroundColor: `${CATEGORY_CONFIG[cat].color}20`,
-                      color: CATEGORY_CONFIG[cat].color,
-                    }}
-                  >
-                    {CATEGORY_CONFIG[cat].icon} {CATEGORY_CONFIG[cat].label}
-                  </Badge>
-                ))}
+                {process.categories.map((cat) => {
+                  const config = CATEGORY_CONFIG[cat]
+                  if (!config) return null
+                  const IconComponent = config.icon
+                  return (
+                    <Badge
+                      key={cat}
+                      variant="secondary"
+                      className="flex items-center gap-1"
+                      style={{
+                        backgroundColor: `${config.color}20`,
+                        color: config.color,
+                      }}
+                    >
+                      <IconComponent className="h-3 w-3" />
+                      {config.label}
+                    </Badge>
+                  )
+                })}
                 {process.tags.map((tag) => (
                   <Badge key={tag} variant="outline" className="text-xs">
                     #{tag}

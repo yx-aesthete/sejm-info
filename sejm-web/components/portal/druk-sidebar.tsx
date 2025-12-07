@@ -219,16 +219,19 @@ export function DrukSidebar({ isOpen, onClose, currentDrukNr }: DrukSidebarProps
                   <DropdownMenuContent align="start" className="w-56">
                     <DropdownMenuLabel>Kategorie tematyczne</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    {(Object.keys(CATEGORY_CONFIG) as LegislativeCategory[]).map((cat) => (
-                      <DropdownMenuCheckboxItem
-                        key={cat}
-                        checked={filters.categories?.includes(cat)}
-                        onCheckedChange={() => toggleCategory(cat)}
-                      >
-                        <span className="mr-2">{CATEGORY_CONFIG[cat].icon}</span>
-                        {CATEGORY_CONFIG[cat].label}
-                      </DropdownMenuCheckboxItem>
-                    ))}
+                    {(Object.keys(CATEGORY_CONFIG) as LegislativeCategory[]).map((cat) => {
+                      const IconComponent = CATEGORY_CONFIG[cat].icon
+                      return (
+                        <DropdownMenuCheckboxItem
+                          key={cat}
+                          checked={filters.categories?.includes(cat)}
+                          onCheckedChange={() => toggleCategory(cat)}
+                        >
+                          <IconComponent className="mr-2 h-4 w-4" />
+                          {CATEGORY_CONFIG[cat].label}
+                        </DropdownMenuCheckboxItem>
+                      )
+                    })}
                   </DropdownMenuContent>
                 </DropdownMenu>
 
