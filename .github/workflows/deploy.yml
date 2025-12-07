@@ -54,3 +54,32 @@ jobs:
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create Ansible Inventory
+        env:
+          DO_IP: ${{ secrets.DO_IP }}
+        run: |
+          echo "[sejm]" > ansible/inventory.ini
+          echo "$DO_IP ansible_user=root ansible_python_interpreter=/usr/bin/python3" >> ansible/inventory.ini
+
+      - name: Run Ansible Playbook
+        env:
+          DO_PASSWORD: ${{ secrets.DO_PASSWORD }}
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+        run: |
+          ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
+          -e "ansible_password=$DO_PASSWORD" \
+          -e "docker_registry=ghcr.io" \
+          -e "docker_user=${{ github.actor }}" \
+          -e "docker_password=${{ secrets.GITHUB_TOKEN }}" \
+          -e "supabase_url=${{ secrets.SUPABASE_URL }}" \
+          -e "supabase_anon_key=${{ secrets.SUPABASE_ANON_KEY }}" \
+          -e "supabase_service_role_key=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+          -e "openai_api_key=${{ secrets.OPENAI_API_KEY }}"
