@@ -64,18 +64,18 @@ jobs:
 
       - name: Create Ansible Inventory
         env:
-          DO_IP: ${{ secrets.DO_IP }}
+          SSH_IP: ${{ secrets.SSH_IP }}
         run: |
           echo "[sejm]" > ansible/inventory.ini
-          echo "$DO_IP ansible_user=root ansible_python_interpreter=/usr/bin/python3" >> ansible/inventory.ini
+          echo "$SSH_IP ansible_user=root ansible_python_interpreter=/usr/bin/python3" >> ansible/inventory.ini
 
       - name: Run Ansible Playbook
         env:
-          DO_PASSWORD: ${{ secrets.DO_PASSWORD }}
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
           ANSIBLE_HOST_KEY_CHECKING: "False"
         run: |
           ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
-          -e "ansible_password=$DO_PASSWORD" \
+          -e "ansible_password=$SSH_PASSWORD" \
           -e "docker_registry=ghcr.io" \
           -e "docker_user=${{ github.actor }}" \
           -e "docker_password=${{ secrets.GITHUB_TOKEN }}" \

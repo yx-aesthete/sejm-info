@@ -16,6 +16,12 @@ import {
   Scale,
   Wallet,
   Building2,
+  BarChart3,
+  Layers,
+  AlertCircle,
+  Calendar,
+  FileCheck,
+  Leaf,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -41,7 +47,7 @@ interface LawDetailProps {
 }
 
 export function LawDetail({ process, isWatched = false, onWatch, onClose }: LawDetailProps) {
-  const [expandedSections, setExpandedSections] = useState<string[]>(["summary", "timeline"])
+  const [expandedSections, setExpandedSections] = useState<string[]>(["summary", "analytics", "timeline"])
   const progress = getProcessProgress(process)
   const currentStage = getCurrentStage(process)
   const nextStage = getNextStage(process)
@@ -157,6 +163,100 @@ export function LawDetail({ process, isWatched = false, onWatch, onClose }: LawD
                       <li key={i}>{change}</li>
                     ))}
                   </ul>
+                </div>
+              </CardContent>
+            )}
+          </Card>
+
+          {/* Parametry analityczne */}
+          <Card>
+            <CardHeader className="cursor-pointer py-3" onClick={() => toggleSection("analytics")}>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4 text-primary" />
+                  Parametry analityczne
+                </CardTitle>
+                {expandedSections.includes("analytics") ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </div>
+            </CardHeader>
+            {expandedSections.includes("analytics") && (
+              <CardContent className="pt-0">
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Liczba etapów */}
+                  <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/30 border border-border">
+                    <Layers className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-xs text-muted-foreground">Etapy procesu</p>
+                      <p className="text-lg font-bold">{process.timeline.length}</p>
+                    </div>
+                  </div>
+
+                  {/* Kategorie */}
+                  <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/30 border border-border">
+                    <FileCheck className="h-4 w-4 text-purple-500 mt-0.5 shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-xs text-muted-foreground">Kategorie</p>
+                      <p className="text-lg font-bold">{process.categories.length}</p>
+                    </div>
+                  </div>
+
+                  {/* Powiązane ustawy */}
+                  <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/30 border border-border">
+                    <Scale className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-xs text-muted-foreground">Powiązane ustawy</p>
+                      <p className="text-lg font-bold">{process.relatedLaws.length}</p>
+                    </div>
+                  </div>
+
+                  {/* Kluczowe zmiany */}
+                  <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/30 border border-border">
+                    <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-xs text-muted-foreground">Kluczowe zmiany</p>
+                      <p className="text-lg font-bold">{process.keyChanges.length}</p>
+                    </div>
+                  </div>
+
+                  {/* Ostatnia aktualizacja */}
+                  <div className="col-span-2 flex items-start gap-2 p-3 rounded-lg bg-muted/30 border border-border">
+                    <Calendar className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs text-muted-foreground">Ostatnia aktualizacja</p>
+                      <p className="text-sm font-medium">
+                        {new Date(process.lastUpdated).toLocaleDateString("pl-PL", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Wpływ środowiskowy (jeśli jest) */}
+                  {process.impact?.environmental && (
+                    <div className="col-span-2 flex items-start gap-2 p-3 rounded-lg bg-green-500/10 border border-green-500/30">
+                      <Leaf className="h-4 w-4 text-green-600 mt-0.5 shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs text-muted-foreground">Wpływ środowiskowy</p>
+                        {process.impact.environmental.co2Impact && (
+                          <p className="text-sm font-bold text-green-600">
+                            {process.impact.environmental.co2Impact > 0 ? "+" : ""}
+                            {process.impact.environmental.co2Impact.toLocaleString()} ton CO₂
+                          </p>
+                        )}
+                        {process.impact.environmental.description && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {process.impact.environmental.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             )}

@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button"
 import { CanvasTimeline } from "@/components/canvas-timeline"
 import { ParliamentHemicycle } from "@/components/parliament-hemicycle"
 import { DrukSidebar } from "@/components/portal/druk-sidebar"
+import { LawDetail } from "@/components/portal/law-detail"
 import {
   INSTITUTION_COLORS,
   INITIATOR_COLORS,
@@ -394,130 +395,13 @@ export function DrukPageClient({ process, drukNr }: DrukPageClientProps) {
             <div className="w-0.5 h-8 bg-border rounded" />
           </div>
 
-          {/* Prawa kolumna - opis */}
-          <div className="flex-1 bg-card rounded-xl border border-border p-4 flex flex-col overflow-hidden min-w-0">
-            {/* Tytuł */}
-            <div className="mb-3 pb-3 border-b border-border shrink-0">
-              <h2 className="font-bold text-lg leading-tight">{process.title}</h2>
-              <p className="text-xs text-muted-foreground mt-1">{process.documentNumber}</p>
-            </div>
-
-            {/* Aktualnie wybrany/hover etap */}
-            {displayStage && (
-              <div className="mb-3 pb-3 border-b border-border shrink-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <div
-                    className="w-3 h-3 rounded"
-                    style={{ backgroundColor: INSTITUTION_COLORS[displayStage.institution]?.border }}
-                  />
-                  <h3 className="font-semibold text-sm">{displayStage.name}</h3>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-                    {INSTITUTION_COLORS[displayStage.institution]?.label}
-                  </span>
-                  {displayStage.status === "current" && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-700">OBECNY</span>
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {displayStage.description || STAGE_DESCRIPTIONS[displayStage.shape] || "Brak opisu dla tego etapu."}
-                </p>
-                {displayStage.legalBasis && (
-                  <p className="text-xs text-muted-foreground mt-2 italic">
-                    Podstawa prawna: {displayStage.legalBasis}
-                  </p>
-                )}
-                {displayStage.dateStart && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Data: {new Date(displayStage.dateStart).toLocaleDateString("pl-PL")}
-                    {displayStage.dateStart !== displayStage.dateEnd &&
-                      displayStage.dateEnd &&
-                      ` → ${new Date(displayStage.dateEnd).toLocaleDateString("pl-PL")}`}
-                  </p>
-                )}
-                {displayStage.votingResult && (
-                  <div className="mt-2 flex gap-3 text-xs">
-                    <span className="text-green-600 font-medium">Za: {displayStage.votingResult.for}</span>
-                    <span className="text-red-600 font-medium">Przeciw: {displayStage.votingResult.against}</span>
-                    <span className="text-gray-500">Wstrzymało się: {displayStage.votingResult.abstained}</span>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* W prostych słowach + Impact */}
-            <div className="flex-1 overflow-auto text-sm text-muted-foreground leading-relaxed space-y-4">
-              {process.simpleExplanation && (
-                <div>
-                  <h4 className="font-semibold text-foreground flex items-center gap-2 mb-2">
-                    <FileText className="h-4 w-4" />W prostych słowach
-                  </h4>
-                  <p>{process.simpleExplanation}</p>
-                  {process.keyChanges && process.keyChanges.length > 0 && (
-                    <ul className="mt-2 space-y-1">
-                      {process.keyChanges.map((change, i) => (
-                        <li key={i} className="flex items-start gap-2">
-                          <span className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                          {change}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )}
-
-              {process.impact && (
-                <div>
-                  <h4 className="font-semibold text-foreground flex items-center gap-2 mb-2">
-                    <TrendingUp className="h-4 w-4" />
-                    Analiza wpływu
-                  </h4>
-                  <div className="space-y-2">
-                    {process.impact.financial && (
-                      <div className="flex items-start gap-2 p-2 rounded bg-amber-500/10 text-amber-700">
-                        <Wallet className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <span className="font-medium">Skutki finansowe: </span>
-                          {process.impact.financial.description}
-                          {process.impact.financial.budgetImpact && (
-                            <span className="block text-xs mt-0.5">
-                              Wpływ na budżet: {process.impact.financial.budgetImpact > 0 ? "+" : ""}
-                              {process.impact.financial.budgetImpact} mln PLN
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    {process.impact.social && (
-                      <div className="flex items-start gap-2 p-2 rounded bg-blue-500/10 text-blue-700">
-                        <Users className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <span className="font-medium">Grupy dotknięte: </span>
-                          {process.impact.social.affectedGroups?.join(", ")}
-                        </div>
-                      </div>
-                    )}
-                    {process.impact.economic && (
-                      <div className="flex items-start gap-2 p-2 rounded bg-green-500/10 text-green-700">
-                        <Building2 className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <span className="font-medium">Sektory: </span>
-                          {process.impact.economic.sectors?.join(", ")}
-                        </div>
-                      </div>
-                    )}
-                    {process.impact.legal && (
-                      <div className="flex items-start gap-2 p-2 rounded bg-purple-500/10 text-purple-700">
-                        <Scale className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                        <div>
-                          <span className="font-medium">Zmiany prawne: </span>
-                          {process.impact.legal.amendedActs?.join(", ")}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+          {/* Prawa kolumna - szczegóły druku */}
+          <div className="flex-1 bg-card rounded-xl border border-border overflow-hidden min-w-0">
+            <LawDetail
+              process={process}
+              isWatched={isWatched}
+              onWatch={(id) => setIsWatched(!isWatched)}
+            />
           </div>
         </div>
 
