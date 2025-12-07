@@ -1,81 +1,41 @@
-name: Build and Push Docker Images
+name: Deploy to VPS
 
 on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
 jobs:
-  build-and-push:
-    runs-on: self-hosted
-    permissions:
-      contents: read
-      packages: write
-
-    strategy:
-      matrix:
-        service: [sejm-web, sejm-sync-service, sejm-ml-service]
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.service }}
-          tags: |
-            type=sha,format=long
-            type=ref,event=branch
-            latest
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./${{ matrix.service }}
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64,linux/arm64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
   deploy:
-    needs: build-and-push
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Inventory generation removed - using static inventory.ini with hardcoded IP
-      # Secrets are passed via environment variables to the playbook command
+      - name: Copy files via SCP
+        uses: appleboy/scp-action@master
+        with:
+          host: 164.90.231.96
+          username: root
+          password: ${{ secrets.SSH_PASSWORD }}
+          source: "."
+          target: "/root/sejm-info"
+          exclude: ".git,node_modules,*/node_modules"
+          rm: false
 
-      - name: Run Ansible Playbook
-        env:
-          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-          ANSIBLE_HOST_KEY_CHECKING: "False"
-        run: |
-          ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
-          -e "ansible_password=$SSH_PASSWORD" \
-          -e "docker_registry=ghcr.io" \
-          -e "docker_user=${{ github.actor }}" \
-          -e "docker_password=${{ secrets.GITHUB_TOKEN }}" \
-          -e "supabase_url=${{ secrets.SUPABASE_URL }}" \
-          -e "supabase_anon_key=${{ secrets.SUPABASE_ANON_KEY }}" \
-          -e "supabase_service_role_key=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
-          -e "openai_api_key=${{ secrets.OPENAI_API_KEY }}"
+      - name: Build and Start with Docker Compose
+        uses: appleboy/ssh-action@master
+        with:
+          host: 164.90.231.96
+          username: root
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd /root/sejm-info
+            # Create .env file from secrets if it doesn't exist or update it
+            echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
+            echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
+            echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> .env
+            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+            
+            # Build and restart containers
+            docker compose up --build -d

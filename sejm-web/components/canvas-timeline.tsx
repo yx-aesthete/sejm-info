@@ -68,7 +68,7 @@ export function CanvasTimeline({
   const showNowLine = externalShowNowLine !== undefined ? externalShowNowLine : internalShowNowLine
   const showAlternatives = externalShowAlternatives !== undefined ? externalShowAlternatives : internalShowAlternatives
 
-  const [layoutMode, setLayoutMode] = useState<LayoutMode>("sequential")
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>("proportional")
   const [pixelsPerDay, setPixelsPerDay] = useState(12)
 
   const [layout, setLayout] = useState<{

@@ -425,7 +425,7 @@ export function DrukPageClient({ process, drukNr }: DrukPageClientProps) {
             hoveredStageId={hoveredStageId}
             onStageHover={handleStageHover}
             showProcessSelector={false}
-            autoScale={true}
+            autoScale={false}
             showNowLine={true}
             showAlternatives={true}
             showControls={true}

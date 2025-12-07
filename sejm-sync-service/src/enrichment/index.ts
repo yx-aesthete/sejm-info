@@ -74,7 +74,7 @@ export async function enrichProcesses(supabase: SupabaseClient, term: number) {
 
           // 3. Extract PDF content (if available)
           console.log(`[Enrichment] ${proc.number}: Checking for PDF...`)
-          const pdfContent = await getProcessPrintContent(prints || [], proc.number)
+          const pdfContent = await getProcessPrintContent(prints || [], proc.number, term)
           const pdfText = pdfContent?.text
 
           if (pdfText) {

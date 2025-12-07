@@ -55,8 +55,9 @@ export async function extractPrintPDF(pdfUrl: string): Promise<PrintContent | nu
  * Pobiera główny druk procesu (najczęściej pierwszy z listy attachments)
  */
 export async function getProcessPrintContent(
-  prints: Array<{ number: string; attachments?: Array<{ name: string; URL: string }> }>,
-  processNumber: string
+  prints: Array<{ number: string; attachments?: any[] }>,
+  processNumber: string,
+  term: number = 10
 ): Promise<PrintContent | null> {
   // Znajdź druk dla tego procesu
   const print = prints.find(p => p.number === processNumber)
@@ -66,13 +67,26 @@ export async function getProcessPrintContent(
     return null
   }
 
-  // Pobierz pierwszy PDF (zazwyczaj główny dokument)
-  const mainAttachment = print.attachments.find(a => a?.name?.toLowerCase().includes(".pdf"))
+  // Find PDF filename
+  // Attachments can be strings (filenames) or objects { name: string }
+  let pdfFilename: string | undefined
 
-  if (!mainAttachment) {
+  for (const att of print.attachments) {
+    const name = typeof att === "string" ? att : att.name
+    if (name && name.toLowerCase().endsWith(".pdf")) {
+      pdfFilename = name
+      break
+    }
+  }
+
+  if (!pdfFilename) {
     console.log(`[PDF] No PDF attachment for print ${processNumber}`)
     return null
   }
 
-  return await extractPrintPDF(mainAttachment.URL)
+  // Construct URL based on Sejm API pattern
+  // Format: https://api.sejm.gov.pl/sejm/term{term}/prints/{printNumber}/{fileName}
+  const url = `https://api.sejm.gov.pl/sejm/term${term}/prints/${processNumber}/${pdfFilename}`
+
+  return await extractPrintPDF(url)
 }
